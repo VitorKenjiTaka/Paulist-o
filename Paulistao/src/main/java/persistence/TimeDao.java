@@ -1,0 +1,42 @@
+package persistence;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import model.time;
+
+public class TimeDao implements ITimeDao<time>{
+	private GenericDao gDao;
+	
+	public TimeDao(GenericDao gDao) {
+		this.gDao = gDao;
+	}
+	@Override
+	public List<time> listarTimes() throws SQLException, ClassNotFoundException {
+		List<time> times = new ArrayList<time>();
+		Connection c = gDao.getConnection();
+		String sql = "SELECT CodigoTime, NomeTime, Cidade, Estadio, MaterialEsportivo FROM times";
+		PreparedStatement ps = c.prepareStatement(sql);
+		ResultSet rs = ps.executeQuery();
+		
+		while (rs.next()) {
+			time t = new time();
+			t.setCod(rs.getInt("CodigoTime"));
+			t.setNome(rs.getString("NomeTime"));
+			t.setCidade(rs.getString("Cidade"));
+			t.setEstadio(rs.getString("Estadio"));
+			t.setMaterial(rs.getString("MaterialEsportivo"));
+			
+			times.add(t);
+		}
+		rs.close();
+		ps.close();
+		c.close();
+		return times;
+	}
+
+}
